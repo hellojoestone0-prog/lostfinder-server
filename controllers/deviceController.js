@@ -18,8 +18,8 @@ function formatDeviceResponse(device) {
 export const registerDevice = async (req, res) => {
   try {
     const { deviceId, name, model, fcmToken, devicePublicKey } = req.body;
-    if (!deviceId || !fcmToken) {
-      return res.status(400).json({ error: 'deviceId and fcmToken are required.' });
+    if (!deviceId) {
+      return res.status(400).json({ error: 'deviceId is required.' });
     }
     const existing = await Device.findOne({ deviceId });
     if (existing) {
@@ -33,7 +33,7 @@ export const registerDevice = async (req, res) => {
         userId: req.user._id,
         deviceName: name || 'My Phone',
         model,
-        fcmToken,
+        ...(fcmToken ? { fcmToken } : {}),
         devicePublicKey,
         lastOnline: new Date()
       },
@@ -57,17 +57,23 @@ export const getDevices = async (req, res) => {
 
 export const heartbeat = async (req, res) => {
   try {
-    const device = await Device.findOne({
-      deviceId: req.params.deviceId,
-      userId: req.user._id
-    });
-    if (!device) {
-      return res.status(404).json({ error: 'Device not found.' });
-    }
-    device.lastOnline = new Date();
-    if (req.body.fcmToken) device.fcmToken = req.body.fcmToken;
-    if (req.body.lastKnownLocation) device.lastKnownLocation = req.body.lastKnownLocation;
-    await device.save();
+    const update = {
+      lastOnline: new Date()
+    };
+    if (req.body?.fcmToken) update.fcmToken = req.body.fcmToken;
+    if (req.body?.lastKnownLocation) update.lastKnownLocation = req.body.lastKnownLocation;
+    const device = await Device.findOneAndUpdate(
+      { deviceId: req.params.deviceId, userId: req.user._id },
+      {
+        $set: update,
+        $setOnInsert: {
+          userId: req.user._id,
+          deviceId: req.params.deviceId,
+          deviceName: 'My Phone'
+        }
+      },
+      { upsert: true, new: true }
+    );
     res.json(formatDeviceResponse(device));
   } catch (error) {
     res.status(500).json({ error: error.message });
