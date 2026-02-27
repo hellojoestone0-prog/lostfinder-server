@@ -7,7 +7,7 @@ Node.js + Express backend.
 ```bash
 npm install
 cp .env.example .env
-# Edit .env: MONGODB_URI, JWT_SECRET, ENCRYPTION_KEY
+# Edit .env: MONGO_URI, JWT_SECRET, ENCRYPTION_KEY
 npm run dev
 ```
 
