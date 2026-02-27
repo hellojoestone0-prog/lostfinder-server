@@ -53,6 +53,5 @@ const deviceSchema = new mongoose.Schema({
 });
 
 deviceSchema.index({ userId: 1 });
-deviceSchema.index({ deviceId: 1 });
 
 export default mongoose.model('Device', deviceSchema);
