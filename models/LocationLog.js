@@ -39,4 +39,4 @@ const locationLogSchema = new mongoose.Schema({
 
 locationLogSchema.index({ deviceId: 1, timestamp: -1 });
 
-export default mongoose.model('LocationLog', locationLogSchema);
+export default mongoose.model('LocationLog', locationLogSchema, 'locationlogs');
