@@ -36,6 +36,7 @@ export const reportLocation = async (req, res) => {
       encryptedPayload
     });
     device.lastKnownLocation = { latitude: lat, longitude: lng, accuracy, timestamp: new Date() };
+    device.lastOnline = new Date();
     await device.save();
     res.status(201).json(log);
   } catch (error) {

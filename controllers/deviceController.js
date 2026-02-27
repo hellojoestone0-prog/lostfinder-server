@@ -1,13 +1,14 @@
 import Device from '../models/Device.js';
 
 function formatDeviceResponse(device) {
-  const fiveMinAgo = new Date(Date.now() - 5 * 60 * 1000);
+  const onlineWindowMinutes = Number(process.env.ONLINE_WINDOW_MINUTES || 15);
+  const onlineCutoff = new Date(Date.now() - onlineWindowMinutes * 60 * 1000);
   return {
     _id: device._id,
     deviceId: device.deviceId,
     name: device.deviceName,
     model: device.model,
-    isOnline: device.lastOnline > fiveMinAgo,
+    isOnline: device.lastOnline > onlineCutoff,
     lastSeen: device.lastOnline,
     lastKnownLocation: device.lastKnownLocation,
     isLostMode: device.isLostMode
