@@ -1,6 +1,7 @@
 import 'dotenv/config';
 import express from 'express';
 import cors from 'cors';
+import mongoose from 'mongoose';
 import { connectDB } from './config/db.js';
 import { apiLimiter } from './middleware/rateLimit.js';
 import authRoutes from './routes/auth.js';
@@ -35,6 +36,15 @@ app.get('/api/health', (_, res) => res.json({ status: 'ok', db: dbConnected }));
 
 app.get('/api/test', (req, res) => {
   res.json({ message: 'Backend working' });
+});
+
+app.get('/db-test', async (_, res) => {
+  try {
+    await mongoose.connection.db.admin().ping();
+    res.send('MongoDB is connected');
+  } catch (err) {
+    res.status(500).send('MongoDB not connected');
+  }
 });
 
 const PORT = process.env.PORT || 5000;
